@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { Activity } from "lucide-react";
+import { ParticleField } from "@/components/effects/ParticleField";
 
 import appCss from "../styles.css?url";
 
