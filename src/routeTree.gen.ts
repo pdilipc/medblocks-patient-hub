@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TriageRouteImport } from './routes/triage'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PatientIdRouteImport } from './routes/patient.$id'
 import { Route as ApiFhirSplatRouteImport } from './routes/api/fhir.$'
 
+const TriageRoute = TriageRouteImport.update({
+  id: '/triage',
+  path: '/triage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +37,47 @@ const ApiFhirSplatRoute = ApiFhirSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/triage': typeof TriageRoute
   '/patient/$id': typeof PatientIdRoute
   '/api/fhir/$': typeof ApiFhirSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/triage': typeof TriageRoute
   '/patient/$id': typeof PatientIdRoute
   '/api/fhir/$': typeof ApiFhirSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/triage': typeof TriageRoute
   '/patient/$id': typeof PatientIdRoute
   '/api/fhir/$': typeof ApiFhirSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/patient/$id' | '/api/fhir/$'
+  fullPaths: '/' | '/triage' | '/patient/$id' | '/api/fhir/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/patient/$id' | '/api/fhir/$'
-  id: '__root__' | '/' | '/patient/$id' | '/api/fhir/$'
+  to: '/' | '/triage' | '/patient/$id' | '/api/fhir/$'
+  id: '__root__' | '/' | '/triage' | '/patient/$id' | '/api/fhir/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TriageRoute: typeof TriageRoute
   PatientIdRoute: typeof PatientIdRoute
   ApiFhirSplatRoute: typeof ApiFhirSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/triage': {
+      id: '/triage'
+      path: '/triage'
+      fullPath: '/triage'
+      preLoaderRoute: typeof TriageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,9 +104,20 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TriageRoute: TriageRoute,
   PatientIdRoute: PatientIdRoute,
   ApiFhirSplatRoute: ApiFhirSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
