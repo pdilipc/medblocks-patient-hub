@@ -99,8 +99,22 @@ function AppHeader() {
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Neurorehab Readiness</div>
           </div>
         </Link>
-        <nav className="text-sm text-muted-foreground">
-          <Link to="/" className="rounded px-3 py-1.5 hover:bg-secondary hover:text-foreground">Patients</Link>
+        <nav className="flex items-center gap-1 text-sm text-muted-foreground">
+          <Link
+            to="/"
+            activeOptions={{ exact: true }}
+            activeProps={{ className: "bg-secondary text-foreground" }}
+            className="rounded px-3 py-1.5 hover:bg-secondary hover:text-foreground"
+          >
+            Patients
+          </Link>
+          <Link
+            to="/triage"
+            activeProps={{ className: "bg-secondary text-foreground" }}
+            className="rounded px-3 py-1.5 hover:bg-secondary hover:text-foreground"
+          >
+            Triage
+          </Link>
         </nav>
       </div>
     </header>
