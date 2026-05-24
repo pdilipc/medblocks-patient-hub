@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { Activity } from "lucide-react";
-import { ParticleField } from "@/components/effects/ParticleField";
+import { ParticleFieldClient } from "@/components/effects/ParticleFieldClient";
 
 import appCss from "../styles.css?url";
 
@@ -125,7 +125,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <ParticleField />
+      <ParticleFieldClient />
       <div className="relative min-h-screen">
         <AppHeader />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
