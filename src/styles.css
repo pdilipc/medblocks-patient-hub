@@ -102,8 +102,14 @@
 @layer base {
   * { border-color: var(--color-border); }
   html, body { font-family: var(--font-sans); }
+  html {
+    background:
+      radial-gradient(1200px 700px at 80% -10%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, color-mix(in oklab, var(--chart-5) 10%, transparent), transparent 60%),
+      var(--color-background);
+  }
   body {
-    background-color: var(--color-background);
+    background: transparent;
     color: var(--color-foreground);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
