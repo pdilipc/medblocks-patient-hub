@@ -85,3 +85,72 @@ export function formatPatientName(p: FhirPatient | undefined | null): string {
   const given = (n.given ?? []).join(" ");
   return [given, n.family].filter(Boolean).join(" ") || "Unnamed patient";
 }
+
+export const FUGL_MEYER_CODE = "97711-6";
+
+export interface FuglMeyerCohortEntry {
+  patient: FhirPatient;
+  baseline: { value: number; date?: string } | null;
+  final: { value: number; date?: string } | null;
+  count: number;
+  delta: number | null;
+}
+
+interface MixedBundleEntry {
+  resource: FhirPatient | FhirObservation;
+  fullUrl?: string;
+}
+
+export async function listFuglMeyerCohort(): Promise<FuglMeyerCohortEntry[]> {
+  const qs = new URLSearchParams({
+    code: FUGL_MEYER_CODE,
+    _include: "Observation:subject",
+    _count: "500",
+  });
+  const bundle = await request<{ entry?: MixedBundleEntry[] }>(
+    `Observation?${qs.toString()}`,
+  );
+  const entries = bundle.entry ?? [];
+  const patients = new Map<string, FhirPatient>();
+  const scoresByPatient = new Map<string, { value: number; date?: string }[]>();
+
+  for (const e of entries) {
+    const r = e.resource;
+    if (!r) continue;
+    if (r.resourceType === "Patient" && r.id) {
+      patients.set(r.id, r);
+    } else if (r.resourceType === "Observation") {
+      const obs = r as FhirObservation;
+      const ref = obs.subject?.reference ?? "";
+      const id = ref.startsWith("Patient/") ? ref.slice(8) : ref;
+      const val = obs.valueQuantity?.value;
+      if (!id || val == null) continue;
+      const arr = scoresByPatient.get(id) ?? [];
+      arr.push({ value: val, date: obs.effectiveDateTime ?? obs.issued });
+      scoresByPatient.set(id, arr);
+    }
+  }
+
+  const cohort: FuglMeyerCohortEntry[] = [];
+  for (const [pid, raw] of scoresByPatient.entries()) {
+    const patient = patients.get(pid);
+    if (!patient) continue;
+    const sorted = [...raw].sort((a, b) => {
+      const da = a.date ? Date.parse(a.date) : 0;
+      const db = b.date ? Date.parse(b.date) : 0;
+      return da - db;
+    });
+    const baseline = sorted[0] ?? null;
+    const final = sorted.length > 1 ? sorted[sorted.length - 1] : null;
+    cohort.push({
+      patient,
+      baseline,
+      final,
+      count: sorted.length,
+      delta:
+        baseline && final ? Number((final.value - baseline.value).toFixed(1)) : null,
+    });
+  }
+  cohort.sort((a, b) => (b.delta ?? -Infinity) - (a.delta ?? -Infinity));
+  return cohort;
+}
