@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Brain, TrendingUp, TrendingDown, Minus, UserRound, Sparkles } from "lucide-react";
@@ -12,11 +12,6 @@ import {
   type FuglMeyerCohortEntry,
 } from "@/lib/fhir/client";
 
-const cohortQuery = queryOptions({
-  queryKey: ["fugl-meyer-cohort"],
-  queryFn: () => listFuglMeyerCohort(),
-});
-
 export const Route = createFileRoute("/triage")({
   head: () => ({
     meta: [
@@ -28,27 +23,34 @@ export const Route = createFileRoute("/triage")({
       },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(cohortQuery),
   component: TriagePage,
-  errorComponent: ({ error }) => (
-    <div className="rounded-md border border-destructive/40 bg-destructive/5 p-6 text-sm text-destructive">
-      Failed to load triage cohort: {error.message}
-    </div>
-  ),
-  notFoundComponent: () => <div className="p-6 text-sm">Not found.</div>,
 });
 
 function TriagePage() {
-  const { data: cohort } = useSuspenseQuery(cohortQuery);
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["fugl-meyer-cohort"],
+    queryFn: () => listFuglMeyerCohort(),
+  });
+  const cohort = data ?? [];
   return (
     <div className="space-y-8">
-      <TriageHero count={cohort.length} />
-      <CohortTable cohort={cohort} />
+      <TriageHero count={cohort.length} loading={isLoading} />
+      {isError ? (
+        <Card className="p-6 text-sm text-destructive">
+          Failed to load triage cohort: {(error as Error).message}
+        </Card>
+      ) : isLoading ? (
+        <Card className="p-10 text-center text-sm text-muted-foreground">
+          Scanning observations for Fugl-Meyer assessments…
+        </Card>
+      ) : (
+        <CohortTable cohort={cohort} />
+      )}
     </div>
   );
 }
 
-function TriageHero({ count }: { count: number }) {
+function TriageHero({ count, loading }: { count: number; loading: boolean }) {
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!ref.current) return;
