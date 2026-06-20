@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { gsap } from "gsap";
 import { Plus, Search, UserRound, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -127,9 +128,10 @@ function PatientsPage() {
             </Button>
           </div>
         ) : (
-          <ul className="divide-y divide-border">
-            {(query.data ?? []).map((p) => (
-              <li key={p.id} className="group flex items-center gap-3 p-3 transition hover:bg-accent/40">
+          <PatientList patients={query.data ?? []}>
+            {(p) => (
+              <li key={p.id} className="patient-row group flex items-center gap-3 p-3 transition hover:bg-accent/40">
+
                 <Link
                   to="/patient/$id"
                   params={{ id: p.id! }}
