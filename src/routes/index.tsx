@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { gsap } from "gsap";
 import { Plus, Search, UserRound, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -127,9 +128,9 @@ function PatientsPage() {
             </Button>
           </div>
         ) : (
-          <ul className="divide-y divide-border">
+          <AnimatedList>
             {(query.data ?? []).map((p) => (
-              <li key={p.id} className="group flex items-center gap-3 p-3 transition hover:bg-accent/40">
+              <li key={p.id} className="patient-row group flex items-center gap-3 p-3 transition hover:bg-accent/40">
                 <Link
                   to="/patient/$id"
                   params={{ id: p.id! }}
@@ -159,7 +160,7 @@ function PatientsPage() {
                 </Button>
               </li>
             ))}
-          </ul>
+          </AnimatedList>
         )}
       </Card>
 
@@ -190,3 +191,26 @@ function PatientsPage() {
     </div>
   );
 }
+
+function AnimatedList({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLUListElement | null>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from(".patient-row", {
+        y: 8,
+        opacity: 0,
+        duration: 0.35,
+        ease: "power2.out",
+        stagger: 0.025,
+      });
+    }, ref);
+    return () => ctx.revert();
+  }, [children]);
+  return (
+    <ul ref={ref} className="divide-y divide-border">
+      {children}
+    </ul>
+  );
+}
+
