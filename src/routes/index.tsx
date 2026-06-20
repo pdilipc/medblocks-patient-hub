@@ -192,7 +192,7 @@ function PatientsPage() {
   );
 }
 
-function AnimatedList({ children }: { children: React.ReactNode }) {
+function AnimatedList({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLUListElement | null>(null);
   useEffect(() => {
     if (!ref.current) return;
