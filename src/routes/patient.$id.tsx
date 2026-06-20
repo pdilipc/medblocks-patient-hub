@@ -21,6 +21,7 @@ import {
   listVitalObservations,
 } from "@/lib/fhir/client";
 import { VitalsSection } from "@/components/patient/VitalsSection";
+import { SynPhNeReportPanel } from "@/components/synphne/SynPhNeReport";
 
 export const Route = createFileRoute("/patient/$id")({
   head: ({ params }) => ({
@@ -98,6 +99,11 @@ function PatientDetailsPage() {
           <VitalsSection observations={observations.data ?? []} />
         )}
       </section>
+
+      {/* SynPhNe device report (ingested via FHIR facade) */}
+      <SynPhNeReportPanel />
+
+
 
       {/* Conditions */}
       <section className="space-y-3">
