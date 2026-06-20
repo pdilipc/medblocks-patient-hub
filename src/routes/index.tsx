@@ -128,10 +128,9 @@ function PatientsPage() {
             </Button>
           </div>
         ) : (
-          <PatientList patients={query.data ?? []}>
-            {(p) => (
+          <AnimatedList>
+            {(query.data ?? []).map((p) => (
               <li key={p.id} className="patient-row group flex items-center gap-3 p-3 transition hover:bg-accent/40">
-
                 <Link
                   to="/patient/$id"
                   params={{ id: p.id! }}
@@ -161,7 +160,7 @@ function PatientsPage() {
                 </Button>
               </li>
             ))}
-          </ul>
+          </AnimatedList>
         )}
       </Card>
 
