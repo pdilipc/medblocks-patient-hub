@@ -101,8 +101,12 @@ function PatientDetailsPage() {
         )}
       </section>
 
+      {/* Clinical scale scores (PHQ-9, GAD-7, GDS-15, SIS) — ingested via FHIR facade */}
+      <ScaleScoresPanel />
+
       {/* SynPhNe device report (ingested via FHIR facade) */}
       <SynPhNeReportPanel />
+
 
 
 
