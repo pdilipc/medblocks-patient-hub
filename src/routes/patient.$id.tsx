@@ -22,6 +22,7 @@ import {
 } from "@/lib/fhir/client";
 import { VitalsSection } from "@/components/patient/VitalsSection";
 import { SynPhNeReportPanel } from "@/components/synphne/SynPhNeReport";
+import { ScaleScoresPanel } from "@/components/scales/ScaleScoresPanel";
 
 export const Route = createFileRoute("/patient/$id")({
   head: ({ params }) => ({
@@ -100,8 +101,12 @@ function PatientDetailsPage() {
         )}
       </section>
 
+      {/* Clinical scale scores (PHQ-9, GAD-7, GDS-15, SIS) — ingested via FHIR facade */}
+      <ScaleScoresPanel />
+
       {/* SynPhNe device report (ingested via FHIR facade) */}
       <SynPhNeReportPanel />
+
 
 
 
