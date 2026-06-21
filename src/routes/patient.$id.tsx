@@ -22,6 +22,7 @@ import {
 } from "@/lib/fhir/client";
 import { VitalsSection } from "@/components/patient/VitalsSection";
 import { SynPhNeReportPanel } from "@/components/synphne/SynPhNeReport";
+import { ScaleScoresPanel } from "@/components/scales/ScaleScoresPanel";
 
 export const Route = createFileRoute("/patient/$id")({
   head: ({ params }) => ({
